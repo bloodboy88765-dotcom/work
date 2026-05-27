@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooking Portal | Ayush</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Settings Loader -->
+    <script src="settings-loader.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .kitchen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+        .order-card {
+            background: var(--color-bg-card);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+        }
+        .table-badge {
+            background: var(--color-gold);
+            color: var(--color-bg-matte);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 700;
+        }
+        .item-list {
+            list-style: none;
+            padding: 0;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .item-qty {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--color-gold);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+        .stock-panel {
+            padding: 2rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            margin: 2rem;
+        }
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .stock-item {
+            background: rgba(255,255,255,0.03);
+            padding: 1rem;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #28a745; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* Requirement Styles */
+        .requirement-panel {
+            padding: 2rem;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 20px;
+            margin: 2rem;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .requirement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .requirement-card {
+            background: var(--color-bg-card);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 1.2rem;
+            position: relative;
+        }
+        .requirement-card h3 {
+            color: var(--color-gold);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .requirement-card p {
+            font-size: 0.85rem;
+            color: var(--color-gray);
+            line-height: 1.4;
+        }
+
+        /* Modal Styles */
+        .bill-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .bill-content {
+            background: var(--color-bg-card);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        .bill-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.8rem;
+            border-radius: 8px;
+            color: white;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        .action-btn {
+            background: none;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: var(--color-gold);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .action-btn:hover {
+            background: var(--color-gold);
+            color: var(--color-bg-matte);
+        }
+    </style>
+</head>
+<body style="background: var(--color-bg-matte);">
+    <header style="padding: 2rem; border-bottom: 1px solid rgba(212, 175, 55, 0.1); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 style="font-family: 'Playfair Display', serif; color: var(--color-gold);">Cooking Portal</h1>
+            <p style="color: var(--color-gray);">Real-time Kitchen Orders</p>
+        </div>
+        <div id="status-bar" style="display: flex; gap: 2rem;">
+            <div class="stat-card" style="text-align: center;">
+                <div style="font-size: 0.8rem; color: var(--color-gray);">Active Orders</div>
+                <div id="active-count" style="font-size: 1.5rem; font-weight: 700; color: white;">0</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="requirement-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-family: 'Playfair Display', serif; color: var(--color-gold);">Kitchen Requirements</h2>
+                    <p style="color: var(--color-gray);">Request ingredients, stock, or equipment from management.</p>
+                </div>
+                <button class="action-btn" onclick="openKitchenReqModal()">+ Add New Requirement</button>
+            </div>
+            <div class="requirement-grid" id="kitchen-req-grid">
+                <!-- Requirements will be injected here -->
+            </div>
+        </div>
+
+        <div class="kitchen-grid" id="kitchen-queue">
+            <!-- Orders will be injected here -->
+        </div>
+
+        <div class="stock-panel">
+            <h2 style="font-family: 'Playfair Display', serif; color: var(--color-gold);">Menu Stock Management</h2>
+            <p style="color: var(--color-gray);">Toggle items "Out of Stock" to hide them from the Order Portal.</p>
+            <div class="stock-grid" id="stock-grid">
+                <!-- Stock items will be injected here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Requirement Modal -->
+    <div id="kitchen-req-modal" class="bill-modal">
+        <div class="bill-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 id="kreq-modal-title" style="color: var(--color-gold); font-family: 'Playfair Display', serif;">New Requirement</h2>
+                <button class="action-btn" style="border-color: #dc3545; color: #dc3545;" onclick="closeKitchenReqModal()">Close</button>
+            </div>
+            
+            <div class="bill-form">
+                <label style="font-size: 0.8rem; color: var(--color-gray);">Item Name</label>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <input type="text" id="kreq-name" class="bill-input" style="margin-bottom: 0;" placeholder="e.g. Chicken breast (5kg)">
+                    <button class="action-btn" id="kreq-ai-btn" onclick="suggestKitchenReqAI()" style="border-color: #007bff; color: #007bff; white-space: nowrap; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                        Suggest AI
+                    </button>
+                </div>
+
+                <div id="kreq-ai-loading" style="display: none; font-size: 0.8rem; color: #007bff; margin-bottom: 1rem; align-items: center; gap: 0.5rem;">
+                    <div class="spinner" style="width: 12px; height: 12px; border: 2px solid #007bff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    AI is analyzing ingredients...
+                </div>
+                
+                <label style="font-size: 0.8rem; color: var(--color-gray);">Additional Details</label>
+                <textarea id="kreq-details" class="bill-input" style="min-height: 120px; padding: 1rem; line-height: 1.5;" placeholder="List specific requirements or brands..."></textarea>
+                
+                <label style="font-size: 0.8rem; color: var(--color-gray);">Estimated Cost (₹)</label>
+                <input type="number" id="kreq-cost" class="bill-input" placeholder="Enter estimated cost">
+
+                <input type="hidden" id="edit-kreq-index">
+
+                <button class="action-btn" style="margin-top: 1rem; border-color: #28a745; color: #28a745; width: 100%;" onclick="saveKitchenRequirement()">Submit to Management</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="menu-data.js"></script>
+    <script src="notifications.js"></script>
+    <script src="kitchen.js"></script>
+</body>
+</html>
